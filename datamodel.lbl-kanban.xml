@@ -10,7 +10,7 @@
           <type>Overload-cmdbAbstractObject</type>
           <code><![CDATA[	function DisplayBareRelations(WebPage $oPage, $bEditMode = false)
 				{
-					parent::DisplayBareRelations($oPage, $bEditMode);
+				parent::DisplayBareRelations($oPage, $bEditMode);
                             	$oPage->SetCurrentTab(Dict::S('Class:Change:KanbanTab'));
                                 $oPage->add('<div id="row" align="center";">');
                                 $oPage->add('<iframe name="kanban" id="kanban" align="center" style="border:0;padding:0;margin:0;width:56%;height:500px;overflow:auto" ');
