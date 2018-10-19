@@ -1,5 +1,5 @@
 # lbl-kanban
-LICENCE ON THE PASTE.
+LICENSE ON THE PASTE.
 <br>
 Integration with CMDB iTop and JQWidgets. 
 <br>
