@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <classes>
+    <class id="Change" _delta="merge">
+      <fields/>
+      <methods>
+        <method id="DisplayBareRelations" _delta="define">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-cmdbAbstractObject</type>
+          <code><![CDATA[	function DisplayBareRelations(WebPage $oPage, $bEditMode = false)
+				{
+					parent::DisplayBareRelations($oPage, $bEditMode);
+                            	$oPage->SetCurrentTab(Dict::S('Class:Change:KanbanTab'));
+                                $oPage->add('<div id="row" align="center";">');
+                                $oPage->add('<iframe name="kanban" id="kanban" align="center" style="border:0;padding:0;margin:0;width:56%;height:500px;overflow:auto" ');
+                                $oPage->add('src="../extensions/lbl-kanban/main.lbl-kanban.php">');
+                                $oPage->add('</iframe></div>');
+                                $oPage->add('</div>');
+                                $oPage->add('</div>');
+				}]]></code>
+        </method>
+      </methods>
+      <presentation/>
+    </class>
+  </classes>
+</itop_design>
