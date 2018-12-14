@@ -57,7 +57,7 @@
     $chave_key_url = $chave_array_url['2'];
     $ticket_id = preg_replace("/[^0-9]/", "", $chave_key_url);
 
-    $conn = new mysqli("127.0.0.1", "root", "root", "base");
+    $conn = new mysqli("127.0.0.1", "root", "root", "itop");
     $stmt = $conn->prepare("SELECT id, ref, status,description FROM WorkOrder WHERE ticket_id = ?");
     $stmt->bind_param("s", $ticket_id);
     $stmt->execute();
@@ -73,59 +73,42 @@
     }
 
     ?>
-       <script type="text/javascript" charset="UTF-8">
+    <script type="text/javascript" charset="UTF-8">
         $(document).ready(function () {
-
             var fields = [
-                     { name: "id", type: "string" },
-                     { name: "status", map: "state", type: "string" },
-                     { name: "text", map: "label", type: "string" },
-                     { name: "tags", type: "string" },
-                     { name: "color", map: "hex", type: "string" },
-                     { name: "resourceId", type: "number" }
+                {name: "id", type: "string"},
+                {name: "status", map: "status", type: "string"},
+                {name: "text", map: "description", type: "string"},
+                { name: "tags",  map: "ref", type: "string" }
             ];
+            var data = JSON.parse('<?php echo json_encode($outp) ?>');
 
             var source =
-             {
-                 localData: [
-                          { id: "1161", state: "new", label: "Combine Orders", tags: "orders, combine", hex: "#5dc3f0", resourceId: 3 },
-                          { id: "1645", state: "work", label: "Change Billing Address", tags: "billing", hex: "#f19b60", resourceId: 1 },
-                          { id: "9213", state: "new", label: "One item added to the cart", tags: "cart", hex: "#5dc3f0", resourceId: 3 },
-                          { id: "6546", state: "done", label: "Edit Item Price", tags: "price, edit", hex: "#5dc3f0", resourceId: 4 },
-                          { id: "9034", state: "new", label: "Login 404 issue", tags: "issue, login", hex: "#6bbd49" }
-                 ],
-                 dataType: "array",
-                 dataFields: fields
-             };
 
+                {
+                    localData: data,
+                    dataType: "array",
+                    dataFields: fields
+
+                };
             var dataAdapter = new $.jqx.dataAdapter(source);
 
             var resourcesAdapterFunc = function () {
                 var resourcesSource =
-                {
-                    localData: [
-                          { id: 0, name: "No name", image: "../../../jqwidgets/styles/images/common.png", common: true },
-                          { id: 1, name: "Andrew Fuller", image: "../../../images/andrew.png" },
-                          { id: 2, name: "Janet Leverling", image: "../../../images/janet.png" },
-                          { id: 3, name: "Steven Buchanan", image: "../../../images/steven.png" },
-                          { id: 4, name: "Nancy Davolio", image: "../../../images/nancy.png" },
-                          { id: 5, name: "Michael Buchanan", image: "../../../images/Michael.png" },
-                          { id: 6, name: "Margaret Buchanan", image: "../../../images/margaret.png" },
-                          { id: 7, name: "Robert Buchanan", image: "../../../images/robert.png" },
-                          { id: 8, name: "Laura Buchanan", image: "../../../images/Laura.png" },
-                          { id: 9, name: "Laura Buchanan", image: "../../../images/Anne.png" }
-                    ],
-                    dataType: "array",
-                    dataFields: [
-                         { name: "id", type: "number" },
-                         { name: "name", type: "string" },
-                         { name: "image", type: "string" },
-                         { name: "common", type: "boolean" }
-                    ]
-                };
+                    {
+                        localData: data,
+                        dataType: "array",
+                        dataFields: [
+                            {name: "id", type: "number"},
+                            {name: "status", type: "string"},
+                            {name: "text", type: "string"},
+                            {name: "tags", type: "string"}
+                        ]
+                    };
 
                 var resourcesDataAdapter = new $.jqx.dataAdapter(resourcesSource);
                 return resourcesDataAdapter;
+
             }
 
             var getIconClassName = function () {
@@ -140,32 +123,71 @@
                     case "highcontrast":
                     case "ui-sunny":
                     case "ui-darkness":
-                        return "jqx-icon-plus-alt-white ";
+
                 }
                 return "jqx-icon-plus-alt";
             }
-
             $('#kanban').jqxKanban({
-                template: "<div class='jqx-kanban-item' id=''>"
-                        + "<div class='jqx-kanban-item-color-status'></div>"
-                        + "<div style='display: none;' class='jqx-kanban-item-avatar'></div>"
-                        + "<div class='jqx-icon jqx-icon-close-white jqx-kanban-item-template-content jqx-kanban-template-icon'></div>"
-                        + "<div class='jqx-kanban-item-text'></div>"
-                        + "<div style='display: none;' class='jqx-kanban-item-footer'></div>"
-                + "</div>",
                 width: getWidth('kanban'),
+                template: "<div class='jqx-kanban-item' id=''>"
+                + "<div class='jqx-kanban-item-color-status'></div>"
+                + "<div style='display: none;' class='jqx-kanban-item-avatar'></div>"
+                + "<div class='jqx-icon jqx-icon-close jqx-kanban-item-template-content jqx-kanban-template-icon'></div>"
+                + "<div class='jqx-kanban-item-text'></div>"
+                + "<div style='display: none;' class='jqx-kanban-item-footer'></div>"
+                + "</div>",
                 resources: resourcesAdapterFunc(),
+
                 source: dataAdapter,
-                itemRenderer: function(element, item, resource)
-                {
-                    $(element).find(".jqx-kanban-item-color-status").html("<span style='line-height: 23px; margin-left: 5px; color:white;'>" + resource.name + "</span>");
+
+                itemRenderer: function (element, item, resource) {
+                    $(element).find(".jqx-kanban-item-color-status").html("<span style='line-height: 23px; margin-left: 5px;'>" + item.tags + "</span>");
+                    $(element).find(".jqx-kanban-item-text").css('background', item.color);
+
                 },
                 columns: [
-                    { text: "Backlog", iconClassName: getIconClassName(), dataField: "new" },
-                    { text: "In Progress", iconClassName: getIconClassName(), dataField: "work" },
-                    { text: "Done", iconClassName: getIconClassName(), dataField: "done" }
-                ]
+                    {text: "Aguardando atendimento", iconClassName: getIconClassName(), dataField: "aguardando", maxItems: 40},
+                    {text: "Em atendimeto", iconClassName: getIconClassName(), dataField: "atendido", maxItems: 40},
+                    {text: "Resolvido", iconClassName: getIconClassName(), dataField: "resolved", maxItems: 80}
+                ],
+                // render column headers.
+                columnRenderer: function (element, collapsedElement, column) {
+                    var columnItems = $("#kanban").jqxKanban('getColumnItems', column.dataField).length;
+                    // update header's status.
+                    element.find(".jqx-kanban-column-header-status").html(" (" + columnItems + "/" + column.maxItems + ")");
+                    // update collapsed header's status.
+                    collapsedElement.find(".jqx-kanban-column-header-status").html(" (" + columnItems + "/" + column.maxItems + ")");
+                }
+
+
             });
+
+            var estado;
+            $('#kanban').on('itemMoved', function (event) {
+                var args = event.args;
+                estado = args.newColumn.text;
+                id = args.itemId;
+                update();
+            });
+
+            function update() {
+
+                var url = "kbscript.php";
+                var params = "estado=" + estado + "&id=" + id;
+                var http = new XMLHttpRequest();
+                http.open("POST", url, true);
+                http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                http.setRequestHeader("Content-length", params.length);
+                http.setRequestHeader("Connection", "close");
+
+                http.onreadystatechange = function () {
+                    if (http.readyState == 4 && http.status == 200) {
+                        alert("Estado Atualizado para " + estado);
+                    }
+                }
+                http.send(params);
+
+            }
 
         });
     </script>
